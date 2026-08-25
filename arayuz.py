@@ -29,8 +29,23 @@ if yuklenen_dosya is not None:
             alt_yesil = np.array([35, 50, 50])
             ust_yesil = np.array([85, 255, 255])
             maske = cv2.inRange(hsv_resim, alt_yesil, ust_yesil)
-            konturlar, _ = cv2.findContours(maske, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            maske = cv2.inRange(hsv_resim, alt_yesil, ust_yesil)
 
+            # --- YENİ EKLENEN WATERSHED (MESAFE DÖNÜŞÜMÜ) ADIMLARI ---
+            # 1. Ufak tefek parazitleri temizle
+            cekirdek = np.ones((3,3), np.uint8)
+            temiz_maske = cv2.morphologyEx(maske, cv2.MORPH_OPEN, cekirdek, iterations=1)
+            
+            # 2. Mesafe Dönüşümü (Distance Transform) - Hücrelerin merkezini dağ zirvesi gibi bulur
+            mesafe_donusumu = cv2.distanceTransform(temiz_maske, cv2.DIST_L2, 5)
+            
+            # 3. Zirveleri birbirinden ayır (0.4 değeri hassasiyettir)
+            _, ayrilmis_hucreler = cv2.threshold(mesafe_donusumu, 0.4 * mesafe_donusumu.max(), 255, 0)
+            ayrilmis_hucreler = np.uint8(ayrilmis_hucreler)
+            
+            # 4. Konturları artık o devasa maskeden değil, parçalanmış merkezlerden buluyoruz
+            konturlar, _ = cv2.findContours(ayrilmis_hucreler, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            # ---------------------------------------------------------
             kopya_resim = resim.copy()
             hedef_sayisi = 0
             
