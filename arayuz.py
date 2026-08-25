@@ -17,11 +17,7 @@ yuklenen_dosya = st.file_uploader("Lütfen mikroskop görüntüsünü yükleyin 
 
 # --- YENİ: RENK SEÇİM MENÜSÜ ---
 st.markdown("### 🧪 Analiz Edilecek Florasan Rengi")
-secilen_renk = st.selectbox(
-    "Hedef boya tipini seçin:",
-    ("🟢 Yeşil (GFP / FITC)", "🔵 Mavi (DAPI / Hoechst)", "🔴 Kırmızı (RFP / Texas Red)")
-)
-    )
+secilen_renk = st.selectbox("Hedef boya tipini seçin:", ("🟢 Yeşil (GFP / FITC)", "🔵 Mavi (DAPI / Hoechst)", "🔴 Kırmızı (RFP / Texas Red)"))
     # -------------------------------
 if yuklenen_dosya is not None:
     image = Image.open(yuklenen_dosya)
