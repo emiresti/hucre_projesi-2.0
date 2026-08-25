@@ -37,8 +37,9 @@ if yuklenen_dosya is not None:
                 cizim_rengi = (0, 255, 0)
             
             elif "Mavi" in secilen_renk:
-                alt_renk = np.array([100, 50, 50])
-                ust_renk = np.array([130, 255, 255])
+                # DAPI boyasının mora/eflatuna çalan tonlarını da yakalaması için yelpazeyi genişlettik (110-160)
+                alt_renk = np.array([110, 50, 50])
+                ust_renk = np.array([160, 255, 255])
                 maske = cv2.inRange(hsv_resim, alt_renk, ust_renk)
                 cizim_rengi = (255, 0, 0)
             
