@@ -23,61 +23,42 @@ if yuklenen_dosya is not None:
     image = Image.open(yuklenen_dosya)
     img_array = np.array(image)
     resim = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
-# 3. Analiz Butonu
-        if st.button("🚀 Yapay Zeka Analizini Başlat"):
-            with st.spinner('Görüntü işleniyor, hedefler aranıyor ve morfolojik veriler hesaplanıyor...'):
-                hsv_resim = cv2.cvtColor(resim, cv2.COLOR_BGR2HSV)
-                
-                # --- YENİ: SEÇİLEN RENGE GÖRE MASKE OLUŞTURMA ---
-                if "Yeşil" in secilen_renk:
-                    alt_renk = np.array([35, 50, 50])
-                    ust_renk = np.array([85, 255, 255])
-                    maske = cv2.inRange(hsv_resim, alt_renk, ust_renk)
-                    cizim_rengi = (0, 255, 0) # Yeşil çember
-                
-                elif "Mavi" in secilen_renk:
-                    alt_renk = np.array([100, 50, 50])
-                    ust_renk = np.array([130, 255, 255])
-                    maske = cv2.inRange(hsv_resim, alt_renk, ust_renk)
-                    cizim_rengi = (255, 0, 0) # Mavi çember
-                
-                elif "Kırmızı" in secilen_renk:
-                    # Kırmızı renk HSV uzayında 0 ve 180 uçlarına bölündüğü için iki maske birleştirilir
-                    maske1 = cv2.inRange(hsv_resim, np.array([0, 50, 50]), np.array([10, 255, 255]))
-                    maske2 = cv2.inRange(hsv_resim, np.array([160, 50, 50]), np.array([180, 255, 255]))
-                    maske = maske1 + maske2
-                    cizim_rengi = (0, 0, 255) # Kırmızı çember
-                # ------------------------------------------------
-                
-                # Dün eklediğimiz Watershed Kodları buradan devam ediyor...
-                cekirdek = np.ones((3,3), np.uint8)
-                temiz_maske = cv2.morphologyEx(maske, cv2.MORPH_OPEN, cekirdek, iterations=1)
-                # ... (distanceTransform ve findContours kodları aynı kalacak) ...
 
-    # 3. Analiz Butonu
+# 3. Analiz Butonu
     if st.button("🚀 Yapay Zeka Analizini Başlat"):
         with st.spinner('Görüntü işleniyor, hedefler aranıyor ve morfolojik veriler hesaplanıyor...'):
             hsv_resim = cv2.cvtColor(resim, cv2.COLOR_BGR2HSV)
-            alt_yesil = np.array([35, 50, 50])
-            ust_yesil = np.array([85, 255, 255])
-            maske = cv2.inRange(hsv_resim, alt_yesil, ust_yesil)
-            maske = cv2.inRange(hsv_resim, alt_yesil, ust_yesil)
-
-            # --- YENİ EKLENEN WATERSHED (MESAFE DÖNÜŞÜMÜ) ADIMLARI ---
-            # 1. Ufak tefek parazitleri temizle
+            
+            # --- YENİ: SEÇİLEN RENGE GÖRE MASKE OLUŞTURMA ---
+            if "Yeşil" in secilen_renk:
+                alt_renk = np.array([35, 50, 50])
+                ust_renk = np.array([85, 255, 255])
+                maske = cv2.inRange(hsv_resim, alt_renk, ust_renk)
+                cizim_rengi = (0, 255, 0)
+            
+            elif "Mavi" in secilen_renk:
+                alt_renk = np.array([100, 50, 50])
+                ust_renk = np.array([130, 255, 255])
+                maske = cv2.inRange(hsv_resim, alt_renk, ust_renk)
+                cizim_rengi = (255, 0, 0)
+            
+            elif "Kırmızı" in secilen_renk:
+                maske1 = cv2.inRange(hsv_resim, np.array([0, 50, 50]), np.array([10, 255, 255]))
+                maske2 = cv2.inRange(hsv_resim, np.array([160, 50, 50]), np.array([180, 255, 255]))
+                maske = maske1 + maske2
+                cizim_rengi = (0, 0, 255)
+            # ------------------------------------------------
+            
+            # WATERSHED (MESAFE DÖNÜŞÜMÜ) ADIMLARI
             cekirdek = np.ones((3,3), np.uint8)
             temiz_maske = cv2.morphologyEx(maske, cv2.MORPH_OPEN, cekirdek, iterations=1)
             
-            # 2. Mesafe Dönüşümü (Distance Transform) - Hücrelerin merkezini dağ zirvesi gibi bulur
             mesafe_donusumu = cv2.distanceTransform(temiz_maske, cv2.DIST_L2, 5)
-            
-            # 3. Zirveleri birbirinden ayır (0.4 değeri hassasiyettir)
             _, ayrilmis_hucreler = cv2.threshold(mesafe_donusumu, 0.4 * mesafe_donusumu.max(), 255, 0)
             ayrilmis_hucreler = np.uint8(ayrilmis_hucreler)
             
-            # 4. Konturları artık o devasa maskeden değil, parçalanmış merkezlerden buluyoruz
             konturlar, _ = cv2.findContours(ayrilmis_hucreler, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            # ---------------------------------------------------------
+            
             kopya_resim = resim.copy()
             hedef_sayisi = 0
             
