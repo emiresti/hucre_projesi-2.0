@@ -15,11 +15,12 @@ st.markdown("---")
 # 2. Dosya Yükleme Alanı
 yuklenen_dosya = st.file_uploader("Lütfen mikroskop görüntüsünü yükleyin (JPG/PNG)", type=["jpg", "jpeg", "png"])
 
-    # --- YENİ: RENK SEÇİM MENÜSÜ ---
-    st.markdown("### 🧪 Analiz Edilecek Florasan Rengi")
-    secilen_renk = st.selectbox(
-        "Hedef boya tipini seçin:",
-        ("🟢 Yeşil (GFP / FITC)", "🔵 Mavi (DAPI / Hoechst)", "🔴 Kırmızı (RFP / Texas Red)")
+# --- YENİ: RENK SEÇİM MENÜSÜ ---
+st.markdown("### 🧪 Analiz Edilecek Florasan Rengi")
+secilen_renk = st.selectbox(
+    "Hedef boya tipini seçin:",
+    ("🟢 Yeşil (GFP / FITC)", "🔵 Mavi (DAPI / Hoechst)", "🔴 Kırmızı (RFP / Texas Red)")
+)
     )
     # -------------------------------
 if yuklenen_dosya is not None:
