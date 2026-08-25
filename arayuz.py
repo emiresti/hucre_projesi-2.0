@@ -13,7 +13,7 @@ st.markdown("**U87 Hücre Hattı - Florasan ve Morfoloji Analiz Arayüzü**")
 st.markdown("---")
 
 # 2. Dosya Yükleme Alanı
-    yuklenen_dosya = st.file_uploader("Lütfen mikroskop görüntüsünü yükleyin (JPG/PNG)", type=["jpg", "jpeg", "png"])
+yuklenen_dosya = st.file_uploader("Lütfen mikroskop görüntüsünü yükleyin (JPG/PNG)", type=["jpg", "jpeg", "png"])
 
     # --- YENİ: RENK SEÇİM MENÜSÜ ---
     st.markdown("### 🧪 Analiz Edilecek Florasan Rengi")
