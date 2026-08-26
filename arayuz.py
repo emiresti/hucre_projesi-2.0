@@ -33,6 +33,10 @@ def pdf_rapor_olustur(hedef_sayisi, saglikli, atipik, df_rapor, boya_tipi):
     pdf = FPDF()
     pdf.add_page()
     
+    # PDF HATA ÇÖZÜMÜ: Emojileri ve Türkçe karakterleri PDF'in anlayacağı şekle çeviriyoruz
+    temiz_boya = boya_tipi.replace("🟢", "").replace("🔵", "").replace("🔴", "")
+    temiz_boya = temiz_boya.replace("Yeşil", "Yesil").replace("Kırmızı", "Kirmizi").replace("ı", "i").replace("ş", "s").strip()
+    
     # PDF'de karakter hatası almamak için Türkçe harfleri İngilizce karşılıklarıyla kullanıyoruz
     pdf.set_font("Arial", 'B', 16)
     pdf.cell(200, 10, txt="Biyoinformatik Hucre Analiz Raporu", ln=True, align='C')
@@ -40,7 +44,7 @@ def pdf_rapor_olustur(hedef_sayisi, saglikli, atipik, df_rapor, boya_tipi):
     
     pdf.set_font("Arial", size=12)
     pdf.cell(200, 10, txt=f"Analiz Tarihi: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
-    pdf.cell(200, 10, txt=f"Kullanilan Florasan Boya: {boya_tipi}", ln=True)
+    pdf.cell(200, 10, txt=f"Kullanilan Florasan Boya: {temiz_boya}", ln=True)
     pdf.cell(200, 10, txt=f"Toplam Tespit Edilen Hedef: {hedef_sayisi}", ln=True)
     pdf.cell(200, 10, txt=f"Duzenli (Saglikli) Hucre Sayisi: {saglikli}", ln=True)
     pdf.cell(200, 10, txt=f"Deforme (Atipik) Hucre Sayisi: {atipik}", ln=True)
@@ -162,7 +166,6 @@ if islem_dosyasi is not None:
                     
                     rapor_verileri.append({"Hedef ID": hedef_sayisi, "Alan (px)": round(alan, 2), "Dairesellik": round(dairesellik, 3), "Durum": durum})
 
-            # Analiz bitince veritabanına kayıt atıyoruz
             if hedef_sayisi > 0:
                 conn = sqlite3.connect('laboratuvar_gecmisi.db')
                 c = conn.cursor()
@@ -191,7 +194,6 @@ if islem_dosyasi is not None:
             with col_tablo:
                 st.dataframe(df, use_container_width=True)
                 
-                # --- YAN YANA İKİ İNDİRME BUTONU (PDF ve CSV) ---
                 btn_col1, btn_col2 = st.columns(2)
                 with btn_col1:
                     csv_verisi = df.to_csv(index=False).encode('utf-8')
